@@ -21,8 +21,69 @@ Users will include the user base of Tellurium as well as people seeking a python
 There are many hypothetical use cases for this tool. Here is a short non-exhaustive list of them: 
 
 1. Researchers who want to screen reactions that exhibit certain phenomina kinetically (e.g. those that reach a stable equilibrium) can use this tool to rapidly search the NIST Chemical Kinetics Database for such reactions.
+
+Example code:
+
+```python
+import kinetics_db_interface as kdi
+
+reactions = kdi.search_reactions(reactants=['H2O'], database="NIST")
+
+viable_reactions = []
+for reaction in reactions:
+    results = run_tellurium(reaction.get_tellurium_string())
+    if reaches_equilibrium(results):
+        viable_reactions.append(reaction)
+```
+
+Note that the above use case can also be used in a Jupyter Notebook environment
+
+
 2. This tool can be used to search for reactions that students might be more familiar with, which in turn could be used as tangible use cases for using Tellurium as a modeling tool. 
+
+Example code in a Jupyter Environment
+Cell 1:
+```python
+import kinetics_db_interface as kdi
+
+reactions = kdi.search_reactions(reactants=['H2O'], products=['H+', 'OH-'], database='NIST')
+
+print(reactions)
+
+```
+Cell 2:
+```python
+chosen_reaction = reactions[chosen_index]
+
+print(chosen_reaction.get_rate_info())
+print(chosen_reaction.get_tellurium_string())
+
+results = run_tellurium(chosen_reaction.get_tellurium_string())
+
+```
+
 3. Researcher wants to train a ML model for a chemical kinetics task. The tool can be used to access the NIST Chemical Kinetics Database efficiently on the same popular programming language for ML (python).
+
+Example code
+```python
+import kinetics_db_interface as kdi
+
+# First search for reactions you want to train your model on
+reactions = kdi.search_reactions(reactants=['H2O', 'O2', ...], database='NIST')
+
+# Train your model
+model, optimizer, loss = initialize_ML_objects()
+
+for reaction in reactions:
+    results = run_tellurium(reaction.get_tellurium_string())
+
+    prediction_results = model(reaction.get_tellurium_string())
+
+    l = loss(results, prediction_results)
+
+    optimizer(l)
+
+```
 
 
 ## Citations
