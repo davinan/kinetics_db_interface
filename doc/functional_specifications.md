@@ -8,7 +8,7 @@ There are several chemical kinetics databases available that gather reported kin
 
 Kinetic and thermodynamics data from these datasets have been extensively used to study chemical reactions. For example, *Ravindran et al.* model gasoline spark-ignited engine combustion reactions using liquid thermochemistry data from NIST and modeling software from the Chemkin group [3]. Furthermore, *Chen et al.* simulate reaction mechanisms of silicon production using thermodynamic data from the Chemkin database [4]. 
 
-Data scientists must efficiently leverage interfaces such as the ones described to conduct their research. They do so by using APIs that match nicely and are intuitive to use. This project aims to create an interface for accessing the NIST Chemical Kinetics Database for kinetic data ready to run simulations in Tellurium. 
+Data scientists must efficiently leverage interfaces such as the ones described to conduct their research. They do so by using APIs that match nicely and are intuitive to use. This project aims to create an interface for accessing the NIST Chemical Kinetics Database for kinetic data ready to run simulations in Tellurium. The interface will also be designed to be scalable to incorporate new repositories of kinetic constants such as BioModels. In each database search method there will be an option to choose which database or repository to use, a flexibility which will be handled in the backend.
 
 
 ## User Profile 
