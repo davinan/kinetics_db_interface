@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import io
-from reaction import Reaction
+from kinetics_interface.reaction import Reaction
 
 ENTRYID_QUERY_URL = 'http://sabiork.h-its.org/sabioRestWebServices/searchKineticLaws/entryIDs'
 PARAM_QUERY_URL = 'http://sabiork.h-its.org/entry/exportToExcelCustomizable'
