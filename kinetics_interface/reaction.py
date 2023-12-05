@@ -1,4 +1,5 @@
 from typing import List, Dict
+import tellurium as te
 
 class Reaction:
 
@@ -75,6 +76,7 @@ class Reaction:
             and self.Km is not None
             and self.Vmax is not None
         )
+
     def get_concentrations(self, with_range=True, prefix=""):
         s = ""
         for k, v in self.concentrations.items():
@@ -83,12 +85,15 @@ class Reaction:
             else:
                 s += f"{prefix}{k} = {v['using']};\n"
         return s
+
     def get_all_species(self):
         return ', '.join([v for k, v in self.name_map.items()])
+
     def get_reaction_string(self):
         s = f"\tJ1: {' + '.join([self.name_map[i] for i in self.reaction['reactants']])} -> {' + '.join([self.name_map[i] for i in self.reaction['products']])}; "
         s += f"Vmax*{self.Km['species']}/(Km+{self.Km['species']});"
         return s
+
     def get_model(self):
         model = ""
         model += f"\nmodel {self.name}\n"
@@ -99,3 +104,13 @@ class Reaction:
         model += f"\n\tKm={self.Km['using']}"
         model += f"\nend"
         return model
+    
+    def plot_tellurium(self, range=(0, 100), num_timesteps=1000):
+        te.setDefaultPlottingEngine('matplotlib')
+        # load models
+        r = te.loada(self.get_model())
+        r.simulate(range[0], range[1], num_timesteps)
+        # plot the simulation
+        # plt.title(R.get_reaction_string())
+        # r.plot()
+        r.plot(xtitle='Time', ytitle='Concentration', title=self.get_reaction_string()[1:])
