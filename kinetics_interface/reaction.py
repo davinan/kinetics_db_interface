@@ -13,15 +13,16 @@ class EnzymeReaction:
 
         if len(Km_rows) == 0 or len(Vmax_rows) == 0 or len(c_rows) == 0 or len(Ki_rows)==0:
             self._is_valid = False
-
+            return
+        self._is_valid = True
 
         self.S_start = min(
-            [x['parameter.startValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.startValue'] != 0]
-            + [x['parameter.endValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.endValue'] != 0]
+            [x['parameter.startValue'] for i, x in c_rows.iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in c_rows.iterrows() if x['parameter.endValue'] != 0]
         )
         self.E_start = min(
-            [x['parameter.startValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.startValue'] != 0]
-            + [x['parameter.endValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.endValue'] != 0]
+            [x['parameter.startValue'] for i, x in c_rows.iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in c_rows.iterrows() if x['parameter.endValue'] != 0]
         )
         self.Km = Km_rows.iloc[0]['parameter.startValue']
         self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
@@ -44,27 +45,15 @@ class EnzymeReaction:
         return self._is_valid
 
     def get_model(self):
-        model = ""
-        model += f"\nmodel {self.name}\n"
-        model += self.get_concentrations(with_range=False, prefix  = "\t")
-        model += f"\tspecies {self.get_all_species()};\n"
-        model += self.get_reaction_string()
-        model += f"\n\tVmax={self.Vmax['using']}"
-        model += f"\n\tKm={self.Km['using']}"
-        model += f"\nend"
-        return model
-
-    def get_model(self):
         model = f"model {self.name}\n"
-        model += f"\nspecies E, S, ES, P;"
-        model += f"\nVmax = {self.Vmax};"
-        model += f"\nKm = {self.Km};"
-        model += f"\nE = {self.E_start};"
-        model += f"\nS = {self.S_start};"
-
-        model += f"\nJ0: E + S -> ES; k1*E*S"
-        model += f"\nJ1: ES -> E + P; Vmax * S / (Km + S)"
-        model += f"\nk1 = {1/self.Ki};"
+        model += f"\n\tspecies E, S, ES, P;\n"
+        model += f"\n\tVmax = {self.Vmax};"
+        model += f"\n\tKm = {self.Km};"
+        model += f"\n\tE = {self.E_start};"
+        model += f"\n\tS = {self.S_start};\n"
+        model += f"\n\tJ0: E + S -> ES; k1*E*S"
+        model += f"\n\tJ1: ES -> E + P; Vmax * S / (Km + S)\n"
+        model += f"\n\tk1 = {1/self.Ki};"
         model += f"\nend"
         return model
 
@@ -76,4 +65,4 @@ class EnzymeReaction:
         # plot the simulation
         # plt.title(R.get_reaction_string())
         # r.plot()
-        r.plot(xtitle='Time', ytitle='Concentration', title=self.get_reaction_string()[1:])
+        r.plot(xtitle='Time', ytitle='Concentration', title=self.name)

@@ -41,7 +41,7 @@ class SabioRKQuery():
         entryIDs = [int(x) for x in request.text.strip().split('\n')]
         print('%d matching entries found.' % len(entryIDs))
         if len(entryIDs) > max_search:
-            print("Reducing search to first 200")
+            print(f"Reducing search to first {max_search}")
             entryIDs = entryIDs[:max_search]
 
         # encode next request, for parameter data given entry IDs
