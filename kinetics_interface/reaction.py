@@ -25,7 +25,7 @@ class EnzymeReaction:
         )
         self.Km = Km_rows.iloc[0]['parameter.startValue']
         self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
-        self.k1 = 1.0
+        self.k1 = 2.0
 
         self.name = f"SabioRKID{self.df.iloc[0].EntryID}"
 
@@ -51,7 +51,8 @@ class EnzymeReaction:
         model += f"\n\tE = {self.E_start};"
         model += f"\n\tS = {self.S_start};\n"
         model += f"\n\tJ0: E + S -> ES; k1*E*S"
-        model += f"\n\tJ1: ES -> E + P; Vmax * S / (Km + S)\n"
+        model += f"\n\tJ1: ES -> E + S; (1/k1)*ES"
+        model += f"\n\tJ2: ES -> E + P; Vmax * S / (Km + S)\n"
         model += f"\n\tk1 = {self.k1};"
         model += f"\nend"
         return model
