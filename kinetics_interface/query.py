@@ -31,7 +31,7 @@ class SabioRKQuery():
         self.query = {'format':'txt', 'q':query_string}
 
 
-    def get_reactions(self):
+    def get_reactions(self, max_search=500):
         # make GET request
         request = requests.get(ENTRYID_QUERY_URL, params=self.query)
         request.raise_for_status() # raise if 404 error
@@ -40,9 +40,9 @@ class SabioRKQuery():
         # each entry is reported on a new line
         entryIDs = [int(x) for x in request.text.strip().split('\n')]
         print('%d matching entries found.' % len(entryIDs))
-        if len(entryIDs) > 200:
+        if len(entryIDs) > max_search:
             print("Reducing search to first 200")
-            entryIDs = entryIDs[:200]
+            entryIDs = entryIDs[:max_search]
 
         # encode next request, for parameter data given entry IDs
         query = {'entryIDs[]':entryIDs, 'format':'tsv', 'fields[]':[

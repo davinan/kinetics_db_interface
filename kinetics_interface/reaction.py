@@ -14,15 +14,14 @@ class EnzymeReaction:
         if len(Km_rows) == 0 or len(Vmax_rows) == 0 or len(c_rows) == 0 or len(Ki_rows)==0:
             self._is_valid = False
 
-        self.conc 
 
         self.S_start = min(
-            [x['parameter.startValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.startValue'] != 0]
-            + [x['parameter.endValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.endValue'] != 0]
+            [x['parameter.startValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.endValue'] != 0]
         )
         self.E_start = min(
-            [x['parameter.startValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.startValue'] != 0]
-            + [x['parameter.endValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.endValue'] != 0]
+            [x['parameter.startValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in c_rows.dropna().iterrows() if x['parameter.endValue'] != 0]
         )
         self.Km = Km_rows.iloc[0]['parameter.startValue']
         self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
