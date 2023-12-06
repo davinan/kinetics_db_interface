@@ -91,7 +91,7 @@ class Reaction:
 
     def get_reaction_string(self):
         s = f"\tJ1: {' + '.join([self.name_map[i] for i in self.reaction['reactants']])} -> {' + '.join([self.name_map[i] for i in self.reaction['products']])}; "
-        s += f"Vmax*{self.Km['species']}/(Km+{self.Km['species']});"
+        s += f"(Vmax*{self.Km['species']})/(Km+{self.Km['species']});"
         return s
 
     def get_model(self):
