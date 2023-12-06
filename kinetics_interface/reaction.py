@@ -66,3 +66,4 @@ class EnzymeReaction:
         # plt.title(R.get_reaction_string())
         # r.plot()
         r.plot(xtitle='Time', ytitle='Concentration', title=self.name)
+        return r.data

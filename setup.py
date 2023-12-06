@@ -10,7 +10,7 @@ setup(
     license='MIT License',
     packages=['kinetics_interface'],
     install_requires=['tellurium',
-                      'numpy',                     
+                      'numpy==1.24.0',                     
                       'pandas',
                       'requests',
     ],
