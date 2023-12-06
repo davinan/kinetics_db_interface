@@ -40,6 +40,10 @@ class SabioRKQuery():
         # each entry is reported on a new line
         entryIDs = [int(x) for x in request.text.strip().split('\n')]
         print('%d matching entries found.' % len(entryIDs))
+        if len(entryIDs) > 200:
+            print("Reducing search to first 200")
+            entryIDs = entryIDs[:200]
+
         # encode next request, for parameter data given entry IDs
         query = {'entryIDs[]':entryIDs, 'format':'tsv', 'fields[]':[
             'EntryID', 
