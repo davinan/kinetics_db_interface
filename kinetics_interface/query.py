@@ -45,14 +45,14 @@ class SabioRKQuery():
             entryIDs = entryIDs[:max_search]
 
         # encode next request, for parameter data given entry IDs
-        query = {'entryIDs[]':entryIDs, 'format':'tsv', 'fields[]':[
+        self.query = {'entryIDs[]':entryIDs, 'format':'tsv', 'fields[]':[
             'EntryID', 
             'Organism', 
             'UniprotID',
             'ECNumber', 
             'PubMedID',
-            'TemperatureRange',
-            'pHValueRange',
+            # 'TemperatureRange',
+            # 'pHValueRange',
             'Parameter',
             'ReactomeReactionID', 
             'HasKineticData', 
@@ -61,7 +61,7 @@ class SabioRKQuery():
             ]}
 
         # make POST request (to get actual data)
-        request = requests.post(PARAM_QUERY_URL, params=query)
+        request = requests.post(PARAM_QUERY_URL, params=self.query)
         request.raise_for_status()
 
         df = pd.read_csv(io.StringIO(request.text), sep="\t")
