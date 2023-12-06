@@ -1,7 +1,7 @@
 import requests
 import pandas as pd
 import io
-from kinetics_interface.reaction import Reaction
+from kinetics_interface.reaction import EnzymeReaction
 
 ENTRYID_QUERY_URL = 'http://sabiork.h-its.org/sabioRestWebServices/searchKineticLaws/entryIDs'
 PARAM_QUERY_URL = 'http://sabiork.h-its.org/entry/exportToExcelCustomizable'
@@ -66,26 +66,10 @@ class SabioRKQuery():
         # for each reaction ID with enough information to carry out Tellurium add it to a list
         valid_reactions = []
         for entry_id in df.EntryID.unique():
-            reaction = {'params' :[],}
-            for i, row in df[df.EntryID == entry_id].iterrows():
-                reaction['reactants'] = row.Substrate.split(";")
-                reaction['products'] = row.Product.split(";")
-                reaction['name'] = row.EntryID
-        
-                reaction['params'].append({
-                    'type': row['parameter.type'],
-                    'associated_species': row['parameter.associatedSpecies'],
-                    'low': row['parameter.startValue'],
-                    'high': row['parameter.endValue'],
-                })
-        
-            try:
 
-                R = Reaction(reaction)
-                if R.is_valid():
-                    valid_reactions.append(R)
-            except:
-                continue
-        print(f"{len(valid_reactions)} reactions found with valid Km and Vmax")
+            R = EnzymeReaction(df[df.EntryID == entry_id])
+            if R.is_valid():
+                valid_reactions.append(R)
+        print(f"{len(valid_reactions)} reactions found with valid Km, Ki, and Vmax")
         return df, valid_reactions
 

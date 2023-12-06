@@ -1,102 +1,48 @@
 from typing import List, Dict
 import tellurium as te
 
-class Reaction:
+class EnzymeReaction:
 
-    def __init__(self, queried_reaction):
-        self.name_map = {}
-        count = 1
-        for name in queried_reaction['reactants']:
-            self.name_map[name] = f"S{count}"
-            count +=1
-        count = 1
-        for name in queried_reaction['products']:
-            self.name_map[name] = f"P{count}"
-            count +=1
-        self._get_concentrations(queried_reaction)
-        self._get_Vmax(queried_reaction)
-        self._get_Km(queried_reaction)
+    def __init__(self, reaction_df):
 
-        self.name = f"Reaction{queried_reaction['name']}"
-        self.reaction = queried_reaction
+        self.df = reaction_df
+        Km_rows = self.df[self.df['parameter.type'] == 'Km']
+        Ki_rows = self.df[self.df['parameter.type'] == 'Ki']
+        Vmax_rows = self.df[self.df['parameter.type'] == 'Vmax']
+        c_rows = self.df[self.df['parameter.type'] == 'concentration']
 
-    def _get_value_dict(self, param):
-        value_dict = {
-            'low': param['low'],
-            'high': param['high']
-        }
-        if str(value_dict['low']) == 'nan':
-            if str(value_dict['high']) == 'nan':
-                value_dict['using'] = 'nan'
-            else:
-                value_dict['using'] = value_dict['high']
-        else:
-            if str(value_dict['high']) == 'nan':
-                value_dict['using'] = value_dict['low']
-            else:
-                value_dict['using'] = (value_dict['high'] + value_dict['low']) / 2
-        return value_dict
+        if len(Km_rows) == 0 or len(Vmax_rows) == 0 or len(c_rows) == 0 or len(Ki_rows)==0:
+            self._is_valid = False
 
-    def _get_concentrations(self, reaction):
-        species = set(reaction['reactants'])
-        with_concentration = set()
-        conc = {}
-        for param in reaction['params']:
-            if param['type'] == 'concentration':
-                value_dict = self._get_value_dict(param)
-                if str(value_dict['using']) != 'nan':
-                    if param['associated_species'] in self.name_map.keys():
-                        with_concentration.add(self.name_map[param['associated_species']])
-                        conc[self.name_map[param['associated_species']]] = value_dict
+        self.conc 
 
-        self.has_concentrations = len(with_concentration) == len(species)
-        self.concentrations = conc
+        self.S_start = min(
+            [x['parameter.startValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.endValue'] != 0]
+        )
+        self.E_start = min(
+            [x['parameter.startValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.startValue'] != 0]
+            + [x['parameter.endValue'] for i, x in self.conc.dropna().iterrows() if x['parameter.endValue'] != 0]
+        )
+        self.Km = Km_rows.iloc[0]['parameter.startValue']
+        self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
+        self.Ki = Ki_rows.iloc[0]['parameter.startValue']
 
-    def _get_Vmax(self, reaction):
-        has_Vmax = False
-        Vmax = None
-        conc = {}
-        for param in reaction['params']:
-            if param['type'] == 'Vmax':
-                value_dict = self._get_value_dict(param)
-                if str(value_dict['using']) != 'nan':
-                    Vmax = value_dict
-        self.Vmax = Vmax
+        self.name = f"SabioRKID{self.df.iloc[0].EntryID}"
 
-    def _get_Km(self, reaction):
-        Km = None
-        conc = {}
-        for param in reaction['params']:
-            if param['type'] == 'Km':
-                value_dict = self._get_value_dict(param)
-                if str(value_dict['using'] )!= 'nan':
-                    Km = value_dict
-                    Km['species'] = self.name_map[param['associated_species']]
-        self.Km = Km
+    def change_value(self, Km=None, Vmax=None, S_start=None, E_start=None, Ki=None):
+        if Km is not None: self.Km = Km
+        if Ki is not None: self.Ki = Ki
+        if Vmax is not None: self.Vmax = Vmax
+        if E_start is not None: self.E_start = E_start
+        if S_start is not None: self.S_start = S_start
+        return self.get_reaction_details()
+
+    def get_reaction_details(self):
+        return self.df
 
     def is_valid(self):
-        return (
-            self.has_concentrations
-            and self.Km is not None
-            and self.Vmax is not None
-        )
-
-    def get_concentrations(self, with_range=True, prefix=""):
-        s = ""
-        for k, v in self.concentrations.items():
-            if with_range:
-                s += f"{prefix}{k}: [{v['low'], v['high']}], using {v['using']}"
-            else:
-                s += f"{prefix}{k} = {v['using']};\n"
-        return s
-
-    def get_all_species(self):
-        return ', '.join([v for k, v in self.name_map.items()])
-
-    def get_reaction_string(self):
-        s = f"\tJ1: {' + '.join([self.name_map[i] for i in self.reaction['reactants']])} -> {' + '.join([self.name_map[i] for i in self.reaction['products']])}; "
-        s += f"(Vmax*{self.Km['species']})/(Km+{self.Km['species']});"
-        return s
+        return self._is_valid
 
     def get_model(self):
         model = ""
@@ -108,7 +54,21 @@ class Reaction:
         model += f"\n\tKm={self.Km['using']}"
         model += f"\nend"
         return model
-    
+
+    def get_model(self):
+        model = f"model {self.name}\n"
+        model += f"\nspecies E, S, ES, P;"
+        model += f"\nVmax = {self.Vmax};"
+        model += f"\nKm = {self.Km};"
+        model += f"\nE = {self.E_start};"
+        model += f"\nS = {self.S_start};"
+
+        model += f"\nJ0: E + S -> ES; k1*E*S"
+        model += f"\nJ1: ES -> E + P; Vmax * S / (Km + S)"
+        model += f"\nk1 = {1/self.Ki};"
+        model += f"\nend"
+        return model
+
     def plot_tellurium(self, range=(0, 100), num_timesteps=1000):
         te.setDefaultPlottingEngine('matplotlib')
         # load models
