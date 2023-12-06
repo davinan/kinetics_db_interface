@@ -79,9 +79,13 @@ class SabioRKQuery():
                     'high': row['parameter.endValue'],
                 })
         
-            R = Reaction(reaction)
-            if R.is_valid():
-                valid_reactions.append(R)
+            try:
+
+                R = Reaction(reaction)
+                if R.is_valid():
+                    valid_reactions.append(R)
+            except:
+                continue
         print(f"{len(valid_reactions)} reactions found with valid Km and Vmax")
         return df, valid_reactions
 
