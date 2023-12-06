@@ -9,8 +9,9 @@ class Reaction:
         for name in queried_reaction['reactants']:
             self.name_map[name] = f"S{count}"
             count +=1
+        count = 1
         for name in queried_reaction['products']:
-            self.name_map[name] = f"S{count}"
+            self.name_map[name] = f"P{count}"
             count +=1
         self._get_concentrations(queried_reaction)
         self._get_Vmax(queried_reaction)
