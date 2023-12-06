@@ -25,7 +25,7 @@ class EnzymeReaction:
         )
         self.Km = Km_rows.iloc[0]['parameter.startValue']
         self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
-        self.k1 = 2.0
+        self.k1 = 10.0
 
         self.name = f"SabioRKID{self.df.iloc[0].EntryID}"
 
