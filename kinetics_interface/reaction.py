@@ -60,9 +60,9 @@ class EnzymeReaction:
         te.setDefaultPlottingEngine('matplotlib')
         # load models
         r = te.loada(self.get_model())
-        r.simulate(range[0], range[1], num_timesteps)
+        data = r.simulate(range[0], range[1], num_timesteps)
         # plot the simulation
         # plt.title(R.get_reaction_string())
         # r.plot()
         r.plot(xtitle='Time', ytitle='Concentration', title=self.name)
-        return r.data
+        return data
