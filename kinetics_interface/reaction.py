@@ -5,10 +5,13 @@ class Reaction:
 
     def __init__(self, queried_reaction):
         self.name_map = {}
+        count = 1
         for name in queried_reaction['reactants']:
-            self.name_map[name] = name.replace(",", "comma").replace("+", "plus").replace("-", "minus")
+            self.name_map[name] = f"S{count}"
+            count +=1
         for name in queried_reaction['products']:
-            self.name_map[name] = name.replace(",", "comma").replace("+", "plus").replace("-", "minus")
+            self.name_map[name] = f"S{count}"
+            count +=1
         self._get_concentrations(queried_reaction)
         self._get_Vmax(queried_reaction)
         self._get_Km(queried_reaction)
