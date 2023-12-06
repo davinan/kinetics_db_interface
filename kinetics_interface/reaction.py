@@ -7,11 +7,10 @@ class EnzymeReaction:
 
         self.df = reaction_df
         Km_rows = self.df[self.df['parameter.type'] == 'Km']
-        Ki_rows = self.df[self.df['parameter.type'] == 'Ki']
         Vmax_rows = self.df[self.df['parameter.type'] == 'Vmax']
         c_rows = self.df[self.df['parameter.type'] == 'concentration']
 
-        if len(Km_rows) == 0 or len(Vmax_rows) == 0 or len(c_rows) == 0 or len(Ki_rows)==0:
+        if len(Km_rows) == 0 or len(Vmax_rows) == 0 or len(c_rows) == 0:
             self._is_valid = False
             return
         self._is_valid = True
@@ -26,13 +25,13 @@ class EnzymeReaction:
         )
         self.Km = Km_rows.iloc[0]['parameter.startValue']
         self.Vmax = Vmax_rows.iloc[0]['parameter.startValue']
-        self.Ki = Ki_rows.iloc[0]['parameter.startValue']
+        self.k1 = 1.0
 
         self.name = f"SabioRKID{self.df.iloc[0].EntryID}"
 
-    def change_value(self, Km=None, Vmax=None, S_start=None, E_start=None, Ki=None):
+    def change_value(self, Km=None, Vmax=None, S_start=None, E_start=None, k1=None):
         if Km is not None: self.Km = Km
-        if Ki is not None: self.Ki = Ki
+        if k1 is not None: self.k1 = k1
         if Vmax is not None: self.Vmax = Vmax
         if E_start is not None: self.E_start = E_start
         if S_start is not None: self.S_start = S_start
@@ -53,7 +52,7 @@ class EnzymeReaction:
         model += f"\n\tS = {self.S_start};\n"
         model += f"\n\tJ0: E + S -> ES; k1*E*S"
         model += f"\n\tJ1: ES -> E + P; Vmax * S / (Km + S)\n"
-        model += f"\n\tk1 = {1/self.Ki};"
+        model += f"\n\tk1 = {self.k1};"
         model += f"\nend"
         return model
 

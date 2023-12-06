@@ -70,6 +70,6 @@ class SabioRKQuery():
             R = EnzymeReaction(df[df.EntryID == entry_id])
             if R.is_valid():
                 valid_reactions.append(R)
-        print(f"{len(valid_reactions)} reactions found with valid Km, Ki, and Vmax")
+        print(f"{len(valid_reactions)} reactions found with valid Km and Vmax")
         return df, valid_reactions
 
